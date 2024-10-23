@@ -1,0 +1,12 @@
+{
+  "extends": "../.nuxt/tsconfig.server.json",
+  "compilerOptions": {
+    "outDir": "../dist/server" // Укажите выходную директорию для серверных файлов
+  },
+  "exclude": [
+    "node_modules",
+    "../.nuxt",
+    "../dist",
+    "**/*.js" // Исключите JavaScript файлы, чтобы избежать ошибок перезаписи
+  ]
+}

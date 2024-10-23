@@ -1,0 +1,12 @@
+@use "variables" as *;
+@use "functions" as *;
+
+@mixin shadow($color: $black-color, $alpha: 0.25) {
+  box-shadow: 0 4px 4px 0 rgba($color, $alpha);
+}
+@mixin shadow-light($color: #7b7b7b, $alpha: 0.15) {
+  box-shadow: 0 4px 24px 0 rgba($color, $alpha);
+}
+@mixin apply-padding($screen-width) {
+  padding: dynamic-padding($screen-width) dynamic-padding($screen-width);
+}

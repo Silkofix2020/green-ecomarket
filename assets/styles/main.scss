@@ -1,0 +1,71 @@
+@import "reset";
+@import "mixins";
+@import "variables";
+@import "functions";
+@import "fonts";
+
+* {
+  box-sizing: border-box;
+  transition: 0.3s;
+}
+
+body {
+  font-family: $font-family;
+  color: $primary-text-color;
+  transition: 0.3s;
+}
+
+h1 {
+  font-size: $font-size-h1;
+  font-weight: $font-weight-bold;
+  color: $primary-color;
+}
+
+h2 {
+  font-size: $font-size-h2;
+  font-weight: $font-weight-bold;
+  color: $primary-color;
+}
+
+h3 {
+  font-size: $font-size-h3;
+  font-weight: $font-weight-medium;
+  color: $primary-color;
+}
+
+h4 {
+  font-size: $font-size-h4;
+  font-weight: $font-weight-medium;
+  color: $primary-color;
+}
+
+h5 {
+  font-size: $font-size-h5;
+  font-weight: $font-weight-medium;
+  color: $primary-color;
+}
+
+h6 {
+  font-size: $font-size-h6;
+  font-weight: $font-weight-medium;
+  color: $primary-color;
+}
+
+p {
+  font-size: $font-size-base;
+  font-weight: $font-weight-regular;
+  color: $primary-text-color;
+}
+a {
+  text-decoration: none;
+}
+
+.small-text {
+  font-size: $font-size-small;
+  font-weight: $font-weight-regular;
+  color: $primary-text-color;
+}
+
+.accent {
+  color: $accent-color;
+}

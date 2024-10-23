@@ -1,0 +1,45 @@
+// Переменные для цветовой палитры
+$primary-color: #56b280;
+$primary-color-hover: #4b996e;
+$primary-color-non-active: #c5c5c5;
+$secondary-color: #272727;
+$accent-color: #5e6e89;
+$white-color: #ffffff;
+$black-color: #000000;
+$background-color: #f7f8fa;
+$primary-text-color: #272727;
+$secondary-text-color: #0b254b;
+$accent-text-color: #1d293f;
+$border-color: #e5e5e5;
+$border-input-color: #898989;
+$border-placeholder-color: #616161;
+$error-color: #d9534f;
+
+// Переменные для шрифтов
+$font-family: "Roboto", sans-serif;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+
+// Переменные для размеров шрифтов
+$font-size-base: 16px;
+$font-size-medium: 20px;
+$font-size-large: 24px;
+$font-size-small: 14px;
+$font-size-extra-small: 10px;
+$font-size-h1: 40px;
+$font-size-h2: 24px;
+$font-size-h3: 20px;
+$font-size-h4: 18px;
+$font-size-h5: 16px;
+$font-size-h6: 14px;
+
+// Переменные для ширины экрана
+$max-width: 1440px;
+
+// Переменные для отступов
+$base-padding: 20px;
+$max-extra-padding: 150px;
+
+// Бордеры
+$input-border: 0.031rem solid $border-input-color;

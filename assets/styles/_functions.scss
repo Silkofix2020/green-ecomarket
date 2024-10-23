@@ -1,0 +1,6 @@
+@use "variables" as *;
+
+@function dynamic-padding($screen-width) {
+  @return ($base-padding * (1 - $screen-width / $max-width)) +
+    ($max-extra-padding * ($screen-width / $max-width));
+}

@@ -1,0 +1,33 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.658.1",
+    "@aws-sdk/node-http-handler": "^3.374.0",
+    "@nuxt/image": "^1.8.0",
+    "@pinia/nuxt": "^0.5.4",
+    "aws-sdk": "^2.1691.0",
+    "axios": "^1.7.7",
+    "consola": "^3.2.3",
+    "dotenv": "^16.4.5",
+    "formidable": "^3.5.1",
+    "mongodb": "^6.8.0",
+    "mysql2": "^3.10.1",
+    "nuxt": "^3.12.2",
+    "nuxt-auth-utils": "^0.1.0",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.29",
+    "vue-router": "^4.3.3"
+  },
+  "devDependencies": {
+    "sass": "^1.77.6"
+  }
+}
