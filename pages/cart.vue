@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import Container from "../Components/UI/Container.vue";
+import Container from "../components/UI/Container.vue";
 import { useCartStore } from "../store/cart";
 
 const cartStore = useCartStore();
