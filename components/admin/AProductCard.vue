@@ -1,273 +1,208 @@
 <template>
   <div class="product-view__content">
-    <NuxtImg
-      class="product-view__poster"
-      :src="product.image_url"
-      format="webp"
-      alt="img"
-    />
-    <div class="product-view__edit">
-      <div class="product-view__item">
-        <h5 class="product-view__item-title">Алиас:</h5>
-        <EditInput
-          :product="product"
-          field="alias"
-          class="product-view__group"
-          @update="updateProductField"
+    <!-- Отображение изображения продукта -->
+    <div class="product-view__images">
+      <!-- Основное изображение -->
+      <div class="product-view__main-image">
+        <NuxtImg
+          class="product-view__poster"
+          :src="product.image_url"
+          format="webp"
+          alt="img"
+          loading="lazy"
         />
-      </div>
-      <div class="product-view__item">
-        <h5 class="product-view__item-title">Наименование:</h5>
-        <EditInput
-          :product="product"
-          field="name"
-          class="product-view__group"
-          @update="updateProductField"
-        />
-      </div>
-      <div class="product-view__item">
-        <h5 class="product-view__item-title">Категория:</h5>
-        <select
-          v-model="selectedCategory"
-          @change="updateCategory"
-          class="product-view__group"
+        <button
+          v-if="product.image_url"
+          @click="deleteImage(product.image_url, 'main')"
+          class="delete-button"
         >
-          <option
-            v-for="category in categories"
-            :key="category._id"
-            :value="category.alias"
-          >
-            {{ category.alias }}
-          </option>
-        </select>
+          Удалить основное изображение
+        </button>
       </div>
-      <div class="product-view__item">
-        <h5 class="product-view__item-title">Описание:</h5>
-        <EditInput
-          :product="product"
-          field="description"
-          :isActive="true"
-          class="product-view__group"
-          @update="updateProductField"
-        />
-      </div>
-      <div class="product-view__item">
-        <h5 class="product-view__item-title">Цена:</h5>
-        <EditInput
-          :product="product"
-          field="price"
-          type="number"
-          class="product-view__group"
-          @update="updateProductField"
-        />
-      </div>
-      <div class="product-view__item">
-        <h5 class="product-view__item-title">Артикул:</h5>
-        <EditInput
-          :product="product"
-          field="sku"
-          class="product-view__group"
-          @update="updateProductField"
-        />
-      </div>
-      <div class="product-view__item">
-        <h5 class="product-view__item-title">Ссылка на изображение:</h5>
-        <EditInput
-          :product="product"
-          field="image_url"
-          class="product-view__group"
-          @update="updateProductField"
-        />
-      </div>
-      <div class="product-view__item">
-        <h5 class="product-view__item-title">Цвета:</h5>
-        <div class="colors-list">
-          <div
-            v-for="(color, index) in product.colors"
-            :key="index"
-            class="color-item"
-          >
-            <div :style="{ backgroundColor: color }" class="color-box"></div>
-            <Input
-              showLabel
-              :customClass="'color-input'"
-              v-model="product.colors[index]"
-              @input="updateColor(index, product.colors[index])"
-              >hex-code</Input
-            >
-            <img
-              class="color-delete"
-              src="/img/ui/iconamoon--close.svg"
-              alt="delete"
-              @click="removeColor(index)"
-            />
-          </div>
-        </div>
-        <div class="new-color">
-          <Input
-            v-model="newColor"
-            class="new-color-input"
-            placeholder="#000000"
-            maxlength="7"
-            @input="prependHash"
-          />
-          <Button @click="addColor">Добавить цвет</Button>
-        </div>
-      </div>
-      <div class="meta-tags">
-        <Input v-model="newTag" placeholder="Добавить тег" />
-        <Button @click="addTag">Добавить тег</Button>
-        <ul>
-          <li v-for="(tag, index) in props.product.tags" :key="index">
-            {{ tag }} <Button @click="removeTag(index)">Удалить</Button>
-          </li>
-        </ul>
-      </div>
-      <Button @click="handleSaveProduct">Сохранить</Button>
-    </div>
 
-    <div>
-      <NuxtImg
-        v-for="(image, index) in product.alternative_images"
-        :key="index"
-        :src="image"
-        format="webp"
-        alt="alternative image"
-        class="product-view__alternative-image"
-      />
+      <!-- Альтернативные изображения -->
+      <div class="product-view__alternative-images">
+        <div
+          v-for="(image, index) in product.alternative_images"
+          :key="index"
+          class="product-view__alternative-image-wrapper"
+        >
+          <NuxtImg
+            class="product-view__alternative-image"
+            :src="image"
+            format="webp"
+            alt="alternative image"
+            loading="lazy"
+          />
+          <button
+            @click="deleteImage(image, 'alternative')"
+            class="delete-button"
+          >
+            Удалить
+          </button>
+        </div>
+      </div>
     </div>
-    <Notification
-      v-if="notificationMessage"
-      :message="notificationMessage"
-      :type="notificationType"
-    />
+    <!-- Редактирование полей продукта -->
+    <div class="product-view__edit">
+      <div
+        class="product-view__item"
+        v-for="field in editableFields"
+        :key="field"
+      >
+        <h5 class="product-view__item-title">{{ field.label }}:</h5>
+        <EditInput
+          :product="product"
+          :field="field.name"
+          :type="field.type || 'text'"
+          class="product-view__group"
+          @update="updateProductField"
+        />
+      </div>
+      <!-- Загрузка изображений -->
+      <div class="product-view__item">
+        <h5 class="product-view__item-title">Основное изображение:</h5>
+        <input type="file" @change="onMainImageSelected" accept="image/*" />
+      </div>
+      <div class="product-view__item">
+        <h5 class="product-view__item-title">Альтернативные изображения:</h5>
+        <input
+          type="file"
+          multiple
+          @change="onAlternativeImagesSelected"
+          accept="image/*"
+        />
+      </div>
+    </div>
   </div>
+  <Button @click="handleSaveProduct">Сохранить</Button>
+
+  <!-- Кнопка для удаления продукта -->
+  <Button @click="confirmDeleteProduct" class="delete-button">
+    Удалить продукт
+  </Button>
+
+  <!-- Уведомления -->
+  <Notification
+    v-if="notificationMessage"
+    :message="notificationMessage"
+    :type="notificationType"
+  />
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
-import { useFetch } from "#app"; // Используем для получения данных с API
-import EditInput from "../UI/EditInput.vue";
-import Notification from "../components/UI/Notification.vue";
+import { ref } from "vue";
+import EditInput from "../components/UI/EditInput.vue";
 import Button from "../components/UI/Button.vue";
-import Input from "../components/UI/Input.vue";
-import { saveProduct } from "../utils/productUtils";
-import { formattedStringToSlug } from "../utils/formattedStringToSlug";
+import {
+  saveProduct,
+  deleteProductImage,
+  deleteProduct,
+} from "../utils/productActions";
+import { useNotification } from "../composables/useNotification";
 
 const props = defineProps({
-  product: {
-    type: Object,
-    required: true,
-  },
-  categories: {
-    type: Object,
-    required: true,
-  },
+  product: { type: Object, required: true },
+  categories: { type: Array, required: true },
 });
 
-const emit = defineEmits(["update"]);
+const emit = defineEmits(["update", "delete"]);
+const { notificationMessage, notificationType, setNotification } =
+  useNotification();
 
-const selectedCategory = ref(props.product.category); // Выбранная категория
-// const categories = ref([]); // Список категорий
+// Переменные для изображений
+const mainImageFile = ref(null);
+const alternativeImagesFiles = ref([]);
 
-// Загрузка категорий при монтировании компонента
-// onMounted(async () => {
-//   try {
-//     const { data } = await useFetch("/api/categories"); // Запрос списка категорий
-//     categories.value = data.value;
-//   } catch (error) {
-//     console.error("Ошибка при загрузке категорий:", error);
-//   }
-// });
+// Поля для редактирования
+const editableFields = [
+  { name: "alias", label: "Алиас" },
+  { name: "name", label: "Наименование" },
+  { name: "description", label: "Описание" },
+  { name: "price", label: "Цена", type: "number" },
+  { name: "sku", label: "Артикул" },
+];
 
-// Обновление категории продукта при изменении выбора в селекте
-const updateCategory = () => {
-  emit("update", {
-    field: "category",
-    value: selectedCategory.value,
-    id: props.product._id,
-  });
-};
-
+// Обновление данных продукта
 const updateProductField = ({ field, value }) => {
   emit("update", { field, value, id: props.product._id });
 };
 
-const newColor = ref("#");
-const prependHash = () => {
-  if (!newColor.value.startsWith("#")) {
-    newColor.value = "#" + newColor.value.replace(/^#+/, "");
-  }
+// Обработчик выбора изображений
+const onMainImageSelected = (event) => {
+  mainImageFile.value = event.target.files[0];
+  console.log("Main image selected:", mainImageFile.value);
 };
 
-const addColor = () => {
-  const hexPattern = /^#[0-9A-F]{6}$/i;
-  if (hexPattern.test(newColor.value.trim())) {
-    props.product.colors.push(newColor.value.trim());
-    newColor.value = "";
-  } else {
-    console.error("Invalid HEX color code");
-  }
+const onAlternativeImagesSelected = (event) => {
+  alternativeImagesFiles.value = Array.from(event.target.files);
+  console.log("Alternative images selected:", alternativeImagesFiles.value);
 };
 
-const updateColor = (index, value) => {
-  props.product.colors[index] = value;
-};
-
-const removeColor = (index) => {
-  props.product.colors.splice(index, 1);
-};
-
-const newTag = ref("");
-if (!props.product.tags) {
-  props.product.tags = [];
-}
-
-const addTag = () => {
-  const tag = newTag.value.trim();
-  if (tag && !props.product.tags.includes(tag)) {
-    props.product.tags.push(tag);
-    newTag.value = "";
-  } else {
-    console.error("Invalid or duplicate tag");
-  }
-};
-
-const removeTag = (index) => {
-  props.product.tags.splice(index, 1);
-};
-
-const notificationMessage = ref("");
-const notificationType = ref("success");
-
+// Сохранение продукта
 const handleSaveProduct = async () => {
-  const result = await saveProduct(props.product);
+  const formData = new FormData();
+
+  // Добавляем поля продукта
+  if (props.product._id) {
+    formData.append("_id", props.product._id);
+  }
+  for (const key in props.product) {
+    formData.append(key, props.product[key]);
+  }
+
+  // Добавляем изображения
+  if (mainImageFile.value) {
+    formData.append("image", mainImageFile.value);
+  }
+  alternativeImagesFiles.value.forEach((file, index) => {
+    formData.append(`alternative_images_${index}`, file);
+  });
+
+  const result = await saveProduct(formData);
   if (result.success) {
-    notificationMessage.value = "Продукт обновлен!";
-    notificationType.value = "success";
+    setNotification("Продукт обновлен!", "success");
   } else {
-    notificationMessage.value = "Ошибка обновления продукта!";
-    notificationType.value = "error";
+    setNotification("Ошибка обновления продукта!", "error");
   }
 };
 
-watch(
-  () => props.product.name,
-  (newName) => {
-    if (newName) {
-      const slug = formattedStringToSlug(newName);
-      emit("update", { field: "alias", value: slug, id: props.product._id });
+// Удаление продукта
+const confirmDeleteProduct = async () => {
+  const isConfirmed = confirm("Вы уверены, что хотите удалить этот продукт?");
+  if (isConfirmed) {
+    const result = await deleteProduct(props.product._id);
+    if (result.success) {
+      setNotification("Продукт успешно удалён!", "success");
+      emit("delete", props.product._id); // Отправляем событие удаления
+    } else {
+      setNotification(`Ошибка удаления продукта: ${result.error}`, "error");
     }
   }
-);
+};
 
-watch(notificationMessage, (newMessage) => {
-  if (newMessage) {
-    setTimeout(() => {
-      notificationMessage.value = "";
-    }, 3000);
+// Функция для удаления изображений
+const deleteImage = async (imageUrl, imageType) => {
+  try {
+    const result = await deleteProductImage(
+      props.product._id,
+      imageUrl,
+      imageType
+    );
+    if (result.success) {
+      setNotification("Изображение успешно удалено", "success");
+      // Удаляем изображение из локального состояния
+      if (imageType === "main") {
+        props.product.image_url = "";
+      } else if (imageType === "alternative") {
+        props.product.alternative_images =
+          props.product.alternative_images.filter((img) => img !== imageUrl);
+      }
+    }
+  } catch (error) {
+    setNotification("Ошибка при удалении изображения", "error");
   }
-});
+};
 </script>
 
 <style lang="scss">
@@ -278,17 +213,42 @@ watch(notificationMessage, (newMessage) => {
     display: flex;
     border-top: 1px solid $primary-color;
     padding: 10px 0;
-    align-items: center;
 
     @media (max-width: 740px) {
       flex-direction: column;
     }
   }
+  &__images {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
   &__poster {
     width: 200px;
+    border: 1px solid rgba($color: $border-input-color, $alpha: 0.3);
   }
-  &__edit {
+
+  &__main-image {
     width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  &__alternative-images {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  &__alternative-image {
+    width: 20%;
+    padding: 5px;
+    border: 1px solid rgba($color: $border-input-color, $alpha: 0.3);
+  }
+
+  &__edit {
+    width: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -433,5 +393,52 @@ watch(notificationMessage, (newMessage) => {
 .color-delete {
   width: 20px;
   cursor: pointer;
+}
+.product-view__images {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.product-view__main-image {
+  position: relative;
+  max-width: 100%;
+}
+
+.product-view__poster {
+  width: 100%;
+  object-fit: cover;
+}
+
+.product-view__alternative-images {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.product-view__alternative-image-wrapper {
+  position: relative;
+}
+
+.product-view__alternative-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.delete-button:hover {
+  background-color: darkred;
 }
 </style>
